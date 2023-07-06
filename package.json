@@ -21,7 +21,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@gomomento/sdk": "1.26.2",
-    "json-buffer": "^3.0.1",
     "keyv": "^4.5.2"
   },
   "devDependencies": {
