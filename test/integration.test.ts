@@ -3,12 +3,13 @@ import Keyv from "keyv";
 import { v4 } from "uuid";
 import { SetupIntegrationTest } from "./integration-setup";
 
-const snooze = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const snooze = async (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 // Handle all the test with listeners.
 EventEmitter.setMaxListeners(200);
 
-const {client} = SetupIntegrationTest();
+const { client } = SetupIntegrationTest();
 
 describe("simple get and set", () => {
   it("keyv get / no expired", async () => {
@@ -35,11 +36,11 @@ describe("simple get and set", () => {
     const testValues = [v4(), v4()];
     const keyv1 = new Keyv({
       store: client,
-      namespace: "1"
+      namespace: "1",
     });
     const keyv2 = new Keyv({
       store: client,
-      namespace: "2"
+      namespace: "2",
     });
 
     await keyv1.set(testKey, testValues[0]);
@@ -57,7 +58,7 @@ describe("simple get and set", () => {
 
     await snooze(2000);
 
-    const value = await keyv.get(testKey) as string;
+    const value = (await keyv.get(testKey)) as string;
 
     expect(value).toEqual(testValue);
   });
@@ -67,11 +68,10 @@ describe("simple get and set", () => {
 
     await snooze(3000);
 
-    const value = await client.get(testKey) as undefined;
+    const value = (await client.get(testKey)) as undefined;
 
     expect(value).toBeUndefined();
   });
-
 
   it("keyv get / expired", async () => {
     const keyv = new Keyv({ store: client });
@@ -111,8 +111,10 @@ describe("simple get and set", () => {
     try {
       await client.set(v4(), v4(), -300);
     } catch (e: any) {
-      expect(e.code).toEqual("ERR_UNHANDLED_ERROR")
-      expect(e.context).toEqual("Invalid argument passed to Momento client: ttl must be a positive integer")
+      expect(e.code).toEqual("ERR_UNHANDLED_ERROR");
+      expect(e.context).toEqual(
+        "Invalid argument passed to Momento client: ttl must be a positive integer"
+      );
     }
   });
 });

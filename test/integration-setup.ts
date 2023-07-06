@@ -6,12 +6,12 @@ import {
   DeleteCache,
   MomentoErrorCode,
   CacheClient,
-  CredentialProvider
+  CredentialProvider,
 } from "@gomomento/sdk";
 import KeyvMomento from "../src";
 
 export function testCacheName(): string {
-  const name = process.env.CACHE_NAME!!;
+  const name = process.env.CACHE_NAME!;
   return name + v4();
 }
 
@@ -28,13 +28,12 @@ function momentoClientForTesting() {
   const IntegrationTestCacheClientProps: CacheClientProps = {
     configuration: Configurations.Laptop.latest(),
     credentialProvider: CredentialProvider.fromEnvironmentVariable({
-      environmentVariableName: "MOMENTO_AUTH_TOKEN"
+      environmentVariableName: "MOMENTO_AUTH_TOKEN",
     }),
-    defaultTtlSeconds: 60
+    defaultTtlSeconds: 60,
   };
   return new CacheClient(IntegrationTestCacheClientProps);
 }
-
 
 export function SetupIntegrationTest(): {
   client: KeyvMomento;
@@ -65,10 +64,7 @@ function setupIntegrationTestWithMomento() {
   });
 
   const momentoClient = momentoClientForTesting();
-  const momentoNodeRedisClient = new KeyvMomento(
-    momentoClient,
-    cacheName
-  );
+  const momentoNodeRedisClient = new KeyvMomento(momentoClient, cacheName);
 
   return { client: momentoNodeRedisClient };
 }
