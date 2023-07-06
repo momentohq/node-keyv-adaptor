@@ -1,5 +1,5 @@
-import { v4 } from "uuid";
-import { CacheClientProps } from "@gomomento/sdk/dist/src/cache-client-props";
+import {v4} from 'uuid';
+import {CacheClientProps} from '@gomomento/sdk/dist/src/cache-client-props';
 import {
   CreateCache,
   Configurations,
@@ -7,11 +7,11 @@ import {
   MomentoErrorCode,
   CacheClient,
   CredentialProvider,
-} from "@gomomento/sdk";
-import KeyvMomento from "../src";
+} from '@gomomento/sdk';
+import KeyvMomento from '../src';
 
 export function testCacheName(): string {
-  const name = process.env.CACHE_NAME!;
+  const name = process.env.CACHE_NAME || 'default-js-integration-cache';
   return name + v4();
 }
 
@@ -28,7 +28,7 @@ function momentoClientForTesting() {
   const IntegrationTestCacheClientProps: CacheClientProps = {
     configuration: Configurations.Laptop.latest(),
     credentialProvider: CredentialProvider.fromEnvironmentVariable({
-      environmentVariableName: "MOMENTO_AUTH_TOKEN",
+      environmentVariableName: 'MOMENTO_AUTH_TOKEN',
     }),
     defaultTtlSeconds: 60,
   };
@@ -66,5 +66,5 @@ function setupIntegrationTestWithMomento() {
   const momentoClient = momentoClientForTesting();
   const momentoNodeRedisClient = new KeyvMomento(momentoClient, cacheName);
 
-  return { client: momentoNodeRedisClient };
+  return {client: momentoNodeRedisClient};
 }

@@ -1,5 +1,5 @@
-import EventEmitter from "node:events";
-import Keyv, { Store, StoredData } from "keyv";
+import EventEmitter from 'node:events';
+import Keyv, {Store, StoredData} from 'keyv';
 import {
   CacheClient,
   CacheDelete,
@@ -7,12 +7,11 @@ import {
   CacheGet,
   CacheItemGetTtl,
   CacheSet,
-} from "@gomomento/sdk";
-import { SetOptions } from "@gomomento/sdk-core/dist/src/clients/ICacheClient";
+} from '@gomomento/sdk';
 
-type KeyvMomentoOptions<Value> = {} & Keyv.Options<Value>;
+type KeyvMomentoOptions<Value> = NonNullable<unknown> & Keyv.Options<Value>;
 
-class KeyvMomento<Value = any> extends EventEmitter implements Store<Value> {
+class KeyvMomento<Value = never> extends EventEmitter implements Store<Value> {
   namespace?: string;
   ttlSupport = true;
   client: CacheClient;
@@ -38,18 +37,18 @@ class KeyvMomento<Value = any> extends EventEmitter implements Store<Value> {
     if (rsp instanceof CacheGet.Hit) {
       return rsp.valueString() as Value;
     } else if (rsp instanceof CacheGet.Error) {
-      this.emit("error", rsp.message());
+      this.emit('error', rsp.message());
     }
     return undefined;
   }
 
-  async getMany(keys: string[]): Promise<Array<StoredData<Value>>> {
+  getMany(keys: string[]): Promise<Array<StoredData<Value>>> {
     const promises = [];
     for (const key of keys) {
       promises.push(this.get(key));
     }
 
-    return Promise.allSettled(promises).then((values) => {
+    return Promise.allSettled(promises).then(values => {
       const data: Array<StoredData<Value>> = [];
       for (const value of values) {
         // @ts-expect-error - value is an object
@@ -61,7 +60,7 @@ class KeyvMomento<Value = any> extends EventEmitter implements Store<Value> {
   }
 
   async set(key: string, value: Value, ttl?: number) {
-    const options: SetOptions = {};
+    const options: {ttl?: number} = {};
 
     if (ttl !== undefined) {
       // eslint-disable-next-line no-multi-assign
@@ -76,19 +75,19 @@ class KeyvMomento<Value = any> extends EventEmitter implements Store<Value> {
       options
     );
     if (rsp instanceof CacheSet.Error) {
-      this.emit("error", rsp.message());
+      this.emit('error', rsp.message());
     }
   }
 
   async delete(key: string): Promise<boolean> {
     const rsp = await this.client.delete(this.cacheName, key);
     if (rsp instanceof CacheDelete.Error) {
-      this.emit("error", rsp.message());
+      this.emit('error', rsp.message());
     }
     return true;
   }
 
-  async deleteMany(keys: string[]): Promise<boolean> {
+  deleteMany(keys: string[]): Promise<boolean> {
     const promises = [];
     for (const key of keys) {
       promises.push(this.delete(key));
@@ -97,14 +96,14 @@ class KeyvMomento<Value = any> extends EventEmitter implements Store<Value> {
     return (
       Promise.allSettled(promises)
         // @ts-expect-error - x is an object
-        .then((values) => values.every((x) => x.value === true))
+        .then(values => values.every(x => x.value === true))
     );
   }
 
   async clear(): Promise<void> {
     const rsp = await this.client.flushCache(this.cacheName);
     if (rsp instanceof CacheFlush.Error) {
-      this.emit("error", rsp.message());
+      this.emit('error', rsp.message());
     }
   }
 
@@ -113,7 +112,7 @@ class KeyvMomento<Value = any> extends EventEmitter implements Store<Value> {
     if (rsp instanceof CacheItemGetTtl.Hit) {
       return true;
     } else if (rsp instanceof CacheItemGetTtl.Error) {
-      this.emit("error", rsp.message());
+      this.emit('error', rsp.message());
     }
     return false;
   }

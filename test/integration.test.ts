@@ -1,46 +1,45 @@
-import { EventEmitter } from "events";
-import Keyv from "keyv";
-import { v4 } from "uuid";
-import { SetupIntegrationTest } from "./integration-setup";
+import {EventEmitter} from 'events';
+import Keyv from 'keyv';
+import {v4} from 'uuid';
+import {SetupIntegrationTest} from './integration-setup';
 
-const snooze = async (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const snooze = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Handle all the test with listeners.
 EventEmitter.setMaxListeners(200);
 
-const { client } = SetupIntegrationTest();
+const {client} = SetupIntegrationTest();
 
-describe("simple get and set", () => {
-  it("keyv get / no expired", async () => {
+describe('simple get and set', () => {
+  it('keyv get / no expired', async () => {
     const testKey = v4();
     const testValue = v4();
     await client.set(testKey, testValue);
     expect(await client.get(testKey)).toEqual(testValue);
   });
-  it("keyv clear", async () => {
+  it('keyv clear', async () => {
     const testKey = v4();
-    await client.set(testKey, "bar");
+    await client.set(testKey, 'bar');
     await client.clear();
     expect(await client.get(testKey)).toBeUndefined();
   });
-  it("keyv get", async () => {
+  it('keyv get', async () => {
     const testKey = v4();
     const testValue = v4();
     expect(await client.get(testKey)).toBeUndefined();
     await client.set(testKey, testValue);
     expect(await client.get(testKey)).toEqual(testValue);
   });
-  it("get with namespace", async () => {
+  it('get with namespace', async () => {
     const testKey = v4();
     const testValues = [v4(), v4()];
     const keyv1 = new Keyv({
       store: client,
-      namespace: "1",
+      namespace: '1',
     });
     const keyv2 = new Keyv({
       store: client,
-      namespace: "2",
+      namespace: '2',
     });
 
     await keyv1.set(testKey, testValues[0]);
@@ -50,8 +49,8 @@ describe("simple get and set", () => {
     expect(await keyv2.get(testKey)).toEqual(testValues[1]);
   });
 
-  it("keyv get / should still exist", async () => {
-    const keyv = new Keyv({ store: client });
+  it('keyv get / should still exist', async () => {
+    const keyv = new Keyv({store: client});
     const testKey = v4();
     const testValue = v4();
     await keyv.set(testKey, testValue, 10_000);
@@ -62,29 +61,29 @@ describe("simple get and set", () => {
 
     expect(value).toEqual(testValue);
   });
-  it("keyv get / expired existing", async () => {
+  it('keyv get / expired existing', async () => {
     const testKey = v4();
-    await client.set(testKey, "expiring_soon", 1000);
+    await client.set(testKey, 'expiring_soon', 1000);
 
     await snooze(3000);
 
-    const value = (await client.get(testKey)) as undefined;
+    const value = await client.get(testKey);
 
     expect(value).toBeUndefined();
   });
 
-  it("keyv get / expired", async () => {
-    const keyv = new Keyv({ store: client });
+  it('keyv get / expired', async () => {
+    const keyv = new Keyv({store: client});
 
     const testKey = v4();
-    await keyv.set(testKey, "expiring soon", 1000);
+    await keyv.set(testKey, 'expiring soon', 1000);
 
     await snooze(1000);
 
     expect(await keyv.get(testKey)).toBeUndefined();
   });
 
-  it("keyv getMany", async () => {
+  it('keyv getMany', async () => {
     const testKeys = [v4(), v4()];
     const testValues = [v4(), v4()];
 
@@ -99,21 +98,22 @@ describe("simple get and set", () => {
     expect(rsp2).toEqual(testValues);
   });
 
-  it("keyv has / false", async () => {
+  it('keyv has / false', async () => {
     expect(await client.has(v4())).toEqual(false);
   });
-  it("keyv has / true", async () => {
+  it('keyv has / true', async () => {
     const testKey = v4();
     await client.set(testKey, v4());
     expect(await client.has(testKey)).toEqual(true);
   });
-  it("keyv should emit errors properly as event emitter", async () => {
+  it('keyv should emit errors properly as event emitter', async () => {
     try {
       await client.set(v4(), v4(), -300);
-    } catch (e: any) {
-      expect(e.code).toEqual("ERR_UNHANDLED_ERROR");
-      expect(e.context).toEqual(
-        "Invalid argument passed to Momento client: ttl must be a positive integer"
+    } catch (e: unknown) {
+      const error = e as {code: string; context: string};
+      expect(error.code).toEqual('ERR_UNHANDLED_ERROR');
+      expect(error.context).toEqual(
+        'Invalid argument passed to Momento client: ttl must be a positive integer'
       );
     }
   });
