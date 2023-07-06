@@ -11,10 +11,7 @@ import {
 
 type KeyvMomentoOptions<Value> = NonNullable<unknown> & Keyv.Options<Value>;
 
-class KeyvMomento<Value = unknown>
-  extends EventEmitter
-  implements Store<Value>
-{
+class KeyvMomento<Value = any> extends EventEmitter implements Store<Value> {
   namespace?: string;
   ttlSupport = true;
   client: CacheClient;

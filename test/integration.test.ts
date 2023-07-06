@@ -67,6 +67,7 @@ describe('simple get and set', () => {
 
     await snooze(3000);
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const value = await client.get(testKey);
 
     expect(value).toBeUndefined();
