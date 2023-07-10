@@ -1,12 +1,12 @@
 import {v4} from 'uuid';
 import {CacheClientProps} from '@gomomento/sdk/dist/src/cache-client-props';
 import {
-  CreateCache,
+  CacheClient,
   Configurations,
+  CreateCache,
+  CredentialProvider,
   DeleteCache,
   MomentoErrorCode,
-  CacheClient,
-  CredentialProvider,
 } from '@gomomento/sdk';
 import KeyvMomento from '../src';
 

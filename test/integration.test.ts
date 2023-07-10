@@ -69,8 +69,17 @@ describe('simple get and set', () => {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const value = await client.get(testKey);
-
     expect(value).toBeUndefined();
+
+    // Test with ttl passed as option that uses seconds instead
+    const testKey2 = v4();
+    await client.set(testKey2, 'expiring_soon', {ttl: 1});
+
+    await snooze(3000);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const value2 = await client.get(testKey2);
+    expect(value2).toBeUndefined();
   });
 
   it('keyv get / expired', async () => {
