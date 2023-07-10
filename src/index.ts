@@ -94,7 +94,7 @@ class KeyvMomento<Value = any> extends EventEmitter implements Store<Value> {
       key,
       // @ts-expect-error - Value needs to be number, string or buffer
       value,
-      options
+      momentoSetOptions
     );
     if (rsp instanceof CacheSet.Error) {
       this.emit('error', rsp.message());
