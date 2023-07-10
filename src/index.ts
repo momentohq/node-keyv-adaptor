@@ -11,6 +11,19 @@ import {
 
 type KeyvMomentoOptions<Value> = NonNullable<unknown> & Keyv.Options<Value>;
 
+/**
+ * KeyValueCacheSetOptions exported to match with apollo graphql set options
+ * defined here:
+ *   https://github.com/apollographql/apollo-utils/blob/main/packages/keyValueCache/src/KeyValueCache.ts
+ */
+interface KeyValueCacheSetOptions {
+  /**
+   * Specified in **seconds**, the time-to-live (TTL) value limits the lifespan
+   * of the data being stored in the cache.
+   */
+  ttl?: number | null;
+}
+
 class KeyvMomento<Value = any> extends EventEmitter implements Store<Value> {
   namespace?: string;
   ttlSupport = true;
@@ -59,12 +72,21 @@ class KeyvMomento<Value = any> extends EventEmitter implements Store<Value> {
     });
   }
 
-  async set(key: string, value: Value, ttl?: number) {
-    const options: {ttl?: number} = {};
+  async set(
+    key: string,
+    value: Value,
+    options?: number | KeyValueCacheSetOptions
+  ) {
+    const momentoSetOptions: {ttl?: number} = {};
 
-    if (ttl !== undefined) {
-      // eslint-disable-next-line no-multi-assign
-      options.ttl = Math.floor(ttl / 1000); // Moving to seconds
+    if (options !== undefined) {
+      if (typeof options === 'number') {
+        momentoSetOptions.ttl = Math.floor(options / 1000); // Moving to seconds
+      } else {
+        if (options.ttl) {
+          momentoSetOptions.ttl = options.ttl;
+        }
+      }
     }
 
     const rsp = await this.client.set(
@@ -72,7 +94,7 @@ class KeyvMomento<Value = any> extends EventEmitter implements Store<Value> {
       key,
       // @ts-expect-error - Value needs to be number, string or buffer
       value,
-      options
+      momentoSetOptions
     );
     if (rsp instanceof CacheSet.Error) {
       this.emit('error', rsp.message());
