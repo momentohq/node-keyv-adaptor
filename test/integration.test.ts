@@ -118,12 +118,14 @@ describe('simple get and set', () => {
   });
   it('keyv should emit errors properly as event emitter', async () => {
     try {
-      await client.set(v4(), v4(), -300);
+      await client.set(v4(), v4(), {
+        ttl: -300,
+      });
     } catch (e: unknown) {
       const error = e as {code: string; context: string};
       expect(error.code).toEqual('ERR_UNHANDLED_ERROR');
       expect(error.context).toEqual(
-        'Invalid argument passed to Momento client: ttl must be a positive integer'
+        'Invalid argument passed to Momento client: ttl must be a positive integer, received -300'
       );
     }
   });
