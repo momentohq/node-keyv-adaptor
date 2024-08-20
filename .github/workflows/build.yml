@@ -23,7 +23,7 @@ jobs:
       matrix:
         node: [16, 18, 19]
     name: Test on Node ${{ matrix.node }}
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     env:
       MOMENTO_AUTH_TOKEN: ${{ secrets.ALPHA_TEST_AUTH_TOKEN }}
       CACHE_NAME: js-keyv-client-test-ci
